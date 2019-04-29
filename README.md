@@ -27,7 +27,7 @@ the Go source code with
 
 I use this code in production on a small low-traffic personal static
 site, but it has some limitations. Server side validation is limited
-to a simple anti-spam honeypotgrep  field. If you want to force your users
+to a simple anti-spam honeypot  field. If you want to force your users
 to give you their real names and email addresses or rent their eyes to
 Google, I'll let you figure out that part yourself. There is nothing
 about rate limiting or throttling in the Terraform configuration, so
