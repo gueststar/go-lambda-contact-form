@@ -1,6 +1,19 @@
-package main
+//    aws lambda function handler for web page contact forms with binary attachments
 
-// aws lambda function handler for web page contact forms with binary attachments
+//    This program is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    This program is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+package main
 
 import (
 	"io"
@@ -90,7 +103,7 @@ func email_body (form *multipart.Form, message *bytes.Buffer) (*multipart.Writer
 		return mw, err
 	}
 	field := strings.Join(form.Value["office"],"\n")  // hidden field that should always be empty unless filled by a bot,
-	if field != "" {                                  // plausibly named with display:none buried in the CSS
+	if field != "" {                                               // plausibly named with display:none buried in the CSS
 		err = errors.New ("spambot attack suspected")
 		return mw, err
 	}

@@ -1,4 +1,4 @@
-# Golang AWS Lambda Contact Form Handler
+# Lumberjack -- Golang AWS Lambda Contact Form Handler
 
 This repo contains a short package written in Go to enable a web
 contact form. The package is meant to be deployed as an [AWS
@@ -42,8 +42,8 @@ and the files are customized as above:
 ```console
 $ terraform init
 $ go get .
-$ GOOS=linux GOARCH=amd64 go build -o contacter main.go
-$ zip -o contacter.zip contacter
+$ GOOS=linux GOARCH=amd64 go build -o lumberjack main.go
+$ zip -o lumberjack.zip lumberjack
 $ terraform apply
 ```
 Then paste the displayed enpoint url into the "action" attribute in the HTML code for your contact form.
@@ -52,9 +52,9 @@ Then paste the displayed enpoint url into the "action" attribute in the HTML cod
 
 Assuming the AWS command line utilities are installed, make quick changes by editing main.go and:
 ```console
-$ GOOS=linux GOARCH=amd64 go build -o contacter main.go
-$ zip -o contacter.zip contacter
-$ aws lambda update-function-code --region us-west-2 --function-name contacter --zip-file fileb://contacter.zip
+$ GOOS=linux GOARCH=amd64 go build -o lumberjack main.go
+$ zip -o lumberjack.zip lumberjack
+$ aws lambda update-function-code --region us-west-2 --function-name lumberjack --zip-file fileb://lumberjack.zip
 ```
 with your preferred region substituted for
 us-west-2. 
@@ -71,3 +71,6 @@ $ terraform destroy
 [apigateway]:[https://docs.aws.amazon.com/apigateway/]
 [terraform]:[https://www.terraform.io]
 
+## About the name
+
+It's a quote from a Bob Dylan song, "you have many contacts, among the lumberjacks, ...".

@@ -11,12 +11,12 @@ data "aws_region" "current" {
 # Define a Lambda function.
 #
 # The handler is the name of the executable for go1.x runtime.
-resource "aws_lambda_function" "contacter" {
-  function_name    = "contacter"
-  filename         = "contacter.zip"
-  handler          = "contacter"
-  source_code_hash = "${base64sha256(file("contacter.zip"))}"
-  role             = "${aws_iam_role.contacter.arn}"
+resource "aws_lambda_function" "lumberjack" {
+  function_name    = "lumberjack"
+  filename         = "lumberjack.zip"
+  handler          = "lumberjack"
+  source_code_hash = "${base64sha256(file("lumberjack.zip"))}"
+  role             = "${aws_iam_role.lumberjack.arn}"
   runtime          = "go1.x"
   memory_size      = 128
   timeout          = 30
@@ -30,7 +30,7 @@ resource "aws_lambda_function" "contacter" {
 # [1]: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_version.html
 
 resource "aws_iam_role_policy" "ses_log_policy" {
-  role = "${aws_iam_role.contacter.id}"
+  role = "${aws_iam_role.lumberjack.id}"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -54,8 +54,8 @@ resource "aws_iam_role_policy" "ses_log_policy" {
 EOF
 }
 
-resource "aws_iam_role" "contacter" {
-  name               = "contacter"
+resource "aws_iam_role" "lumberjack" {
+  name               = "lumberjack"
   assume_role_policy = <<POLICY
 {
   "Version": "2012-10-17",
@@ -72,20 +72,20 @@ resource "aws_iam_role" "contacter" {
 POLICY
 }
 
-# Allow API gateway to invoke the contacter Lambda function.
-resource "aws_lambda_permission" "contacter" {
+# Allow API gateway to invoke the lumberjack Lambda function.
+resource "aws_lambda_permission" "lumberjack" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
-  function_name = "${aws_lambda_function.contacter.arn}"
+  function_name = "${aws_lambda_function.lumberjack.arn}"
   principal     = "apigateway.amazonaws.com"
 }
 
 # A Lambda function is not a usual public REST API. We need to use AWS API
 # Gateway to map a Lambda function to an HTTP endpoint.
-resource "aws_api_gateway_resource" "contacter" {
-  rest_api_id = "${aws_api_gateway_rest_api.contacter.id}"
-  parent_id   = "${aws_api_gateway_rest_api.contacter.root_resource_id}"
-  path_part   = "contacter"
+resource "aws_api_gateway_resource" "lumberjack" {
+  rest_api_id = "${aws_api_gateway_rest_api.lumberjack.id}"
+  parent_id   = "${aws_api_gateway_rest_api.lumberjack.root_resource_id}"
+  path_part   = "lumberjack"
 }
 
 # Binary media types are necessary for contact forms with binary file
@@ -93,16 +93,16 @@ resource "aws_api_gateway_resource" "contacter" {
 # events.APIGatewayProxyRequest structure (including text portions and
 # mime headers) is base64 encoded and must be decoded before being
 # parsed.
-resource "aws_api_gateway_rest_api" "contacter" {
-  name = "contacter"
+resource "aws_api_gateway_rest_api" "lumberjack" {
+  name = "lumberjack"
   binary_media_types = ["multipart/form-data"]
 }
 
 #           POST
 # Internet -----> API Gateway
-resource "aws_api_gateway_method" "contacter" {
-  rest_api_id   = "${aws_api_gateway_rest_api.contacter.id}"
-  resource_id   = "${aws_api_gateway_resource.contacter.id}"
+resource "aws_api_gateway_method" "lumberjack" {
+  rest_api_id   = "${aws_api_gateway_rest_api.lumberjack.id}"
+  resource_id   = "${aws_api_gateway_resource.lumberjack.id}"
   http_method   = "POST"
   authorization = "NONE"
 }
@@ -112,25 +112,25 @@ resource "aws_api_gateway_method" "contacter" {
 # For Lambda the method is always POST and the type is always AWS_PROXY.
 #
 # The date 2015-03-31 in the URI is just the version of AWS Lambda.
-resource "aws_api_gateway_integration" "contacter" {
-  rest_api_id             = "${aws_api_gateway_rest_api.contacter.id}"
-  resource_id             = "${aws_api_gateway_resource.contacter.id}"
-  http_method             = "${aws_api_gateway_method.contacter.http_method}"
+resource "aws_api_gateway_integration" "lumberjack" {
+  rest_api_id             = "${aws_api_gateway_rest_api.lumberjack.id}"
+  resource_id             = "${aws_api_gateway_resource.lumberjack.id}"
+  http_method             = "${aws_api_gateway_method.lumberjack.http_method}"
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:lambda:path/2015-03-31/functions/${aws_lambda_function.contacter.arn}/invocations"
+  uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:lambda:path/2015-03-31/functions/${aws_lambda_function.lumberjack.arn}/invocations"
 }
 
 # This resource defines the URL of the API Gateway.
-resource "aws_api_gateway_deployment" "contacter_v1" {
+resource "aws_api_gateway_deployment" "lumberjack_v1" {
   depends_on = [
-    "aws_api_gateway_integration.contacter"
+    "aws_api_gateway_integration.lumberjack"
   ]
-  rest_api_id = "${aws_api_gateway_rest_api.contacter.id}"
+  rest_api_id = "${aws_api_gateway_rest_api.lumberjack.id}"
   stage_name  = "v1"
 }
 
 # Set the generated URL as an output. Run `terraform output url` to get this.
 output "url" {
-  value = "${aws_api_gateway_deployment.contacter_v1.invoke_url}${aws_api_gateway_resource.contacter.path}"
+  value = "${aws_api_gateway_deployment.lumberjack_v1.invoke_url}${aws_api_gateway_resource.lumberjack.path}"
 }
